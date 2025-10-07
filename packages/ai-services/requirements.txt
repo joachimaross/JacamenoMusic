@@ -1,0 +1,14 @@
+fastapi==0.108.0
+uvicorn[standard]==0.25.0
+python-dotenv==1.0.0
+openai==1.6.1
+numpy==1.26.2
+scipy==1.11.4
+librosa==0.10.1
+soundfile==0.12.1
+pydub==0.25.1
+torch==2.1.2
+transformers==4.36.2
+redis==5.0.1
+httpx==0.26.0
+pillow==10.1.0

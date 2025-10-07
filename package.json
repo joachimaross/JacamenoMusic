@@ -1,0 +1,37 @@
+{
+  "name": "jacameno-music",
+  "version": "1.0.0",
+  "description": "AI-powered music studio and streaming platform",
+  "main": "index.js",
+  "workspaces": [
+    "packages/mobile",
+    "packages/backend",
+    "packages/ai-services"
+  ],
+  "scripts": {
+    "start": "npm run start:backend",
+    "start:mobile": "cd packages/mobile && npm start",
+    "start:backend": "cd packages/backend && npm start",
+    "start:ai": "cd packages/ai-services && python -m uvicorn main:app --reload",
+    "build": "npm run build:mobile && npm run build:backend",
+    "build:mobile": "cd packages/mobile && npm run build",
+    "build:backend": "cd packages/backend && npm run build",
+    "test": "npm run test:backend && npm run test:ai",
+    "test:backend": "cd packages/backend && npm test",
+    "test:ai": "cd packages/ai-services && pytest",
+    "lint": "npm run lint:backend",
+    "lint:backend": "cd packages/backend && npm run lint"
+  },
+  "keywords": [
+    "music",
+    "studio",
+    "ai",
+    "streaming",
+    "collaboration"
+  ],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  }
+}
