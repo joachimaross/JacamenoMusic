@@ -1,0 +1,35 @@
+{
+  "name": "jacameno-music",
+  "version": "1.0.0",
+  "description": "JACAMENO - Next-generation AI music production and streaming platform",
+  "private": true,
+  "workspaces": [
+    "apps/*",
+    "packages/*",
+    "services/*"
+  ],
+  "scripts": {
+    "dev": "npm run dev --workspace=apps/web",
+    "dev:mobile": "npm run dev --workspace=apps/mobile",
+    "dev:api": "npm run dev --workspace=services/api",
+    "dev:ai": "npm run dev --workspace=services/ai",
+    "build": "npm run build --workspaces",
+    "test": "npm run test --workspaces",
+    "lint": "npm run lint --workspaces",
+    "clean": "npm run clean --workspaces && rm -rf node_modules"
+  },
+  "keywords": [
+    "music",
+    "production",
+    "daw",
+    "ai",
+    "streaming",
+    "collaboration"
+  ],
+  "author": "JACAMENO",
+  "license": "MIT",
+  "engines": {
+    "node": ">=18.0.0",
+    "npm": ">=9.0.0"
+  }
+}
