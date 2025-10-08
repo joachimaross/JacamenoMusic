@@ -55,7 +55,7 @@ export default function BetaProgram() {
         {/* What You'll Test */}
         <div className="bg-gray-800 bg-opacity-50 backdrop-blur-sm rounded-lg p-8 md:p-12 mb-16 border border-gray-700">
           <h2 className="text-3xl font-bold text-white mb-8 text-center">
-            What You'll Be Testing
+            What You&apos;ll Be Testing
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <FeatureItem
