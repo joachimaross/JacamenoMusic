@@ -382,23 +382,84 @@ If you had a custom `.eslintrc.js` file before, the new config is simpler and re
 3. Use Vercel Analytics to identify bottlenecks
 4. Enable Edge Functions for faster response times
 
+#### Issue: "No Output Directory named 'public' found" error
+
+**Symptom:**
+```
+Error: No Output Directory named "public" found after the Build completed.
+```
+
+**Explanation:**
+- Next.js apps output to `.next` directory, not `public`
+- The `public` directory in Next.js is for static assets, not build output
+- Vercel needs to be configured to use the correct output directory
+
+**Solution:**
+1. **Verify `apps/web/package.json` has the correct build script:**
+   ```json
+   {
+     "scripts": {
+       "build": "next build"
+     }
+   }
+   ```
+
+2. **Ensure `vercel.json` at repository root is configured correctly:**
+   ```json
+   {
+     "projects": {
+       "web": {
+         "source": "apps/web",
+         "framework": "nextjs"
+       }
+     },
+     "builds": [
+       { "src": "apps/web/package.json", "use": "@vercel/next" }
+     ],
+     "outputDirectory": ".next"
+   }
+   ```
+
+3. **In Vercel Dashboard settings:**
+   - **Framework Preset:** Next.js
+   - **Root Directory:** `apps/web`
+   - **Build Command:** Leave as default (Next.js will use `yarn build` or `npm run build`)
+   - **Output Directory:** Leave as default (`.next`)
+
+4. **Verify locally that build creates `.next` directory:**
+   ```bash
+   cd apps/web
+   yarn build
+   ls -la .next  # Should show cache, server, static directories
+   ```
+
 ### Monorepo-Specific Issues
 
 #### Issue: Vercel can't find workspace dependencies
 
 **Solution:**
-1. Ensure `vercel.json` is properly configured:
+1. Ensure `vercel.json` is properly configured at the repository root:
    ```json
    {
-     "buildCommand": "cd ../.. && yarn install && yarn build:web",
-     "installCommand": "cd ../.. && yarn install"
+     "projects": {
+       "web": {
+         "source": "apps/web",
+         "framework": "nextjs"
+       }
+     },
+     "builds": [
+       { "src": "apps/web/package.json", "use": "@vercel/next" }
+     ],
+     "outputDirectory": ".next"
    }
    ```
 
 2. Or configure in Vercel Dashboard:
-   - **Install Command:** `yarn install`
-   - **Build Command:** `yarn build`
-   - Ensure root directory is set to `apps/web`
+   - **Framework Preset:** Next.js
+   - **Root Directory:** `apps/web`
+   - **Build Command:** `yarn build` (or leave default)
+   - **Output Directory:** `.next` (default for Next.js)
+   - **Install Command:** `yarn install` (or leave default)
 
 ## Local Development
 
@@ -462,6 +523,37 @@ yarn start
 ```
 
 This will start the production server at [http://localhost:3000](http://localhost:3000).
+
+### Verifying Build Output
+
+To verify that the Next.js build produces the correct output directory:
+
+```bash
+cd apps/web
+yarn build
+```
+
+**Expected Result:**
+- A `.next` directory should be created in `apps/web/.next`
+- This directory contains the compiled Next.js application
+- Vercel uses this directory (not a `public` directory) for deployment
+
+**Verify the build output:**
+```bash
+ls -la apps/web/.next
+```
+
+You should see:
+- `cache/` - Build cache
+- `server/` - Server-side code
+- `static/` - Static assets
+- `package.json` - Build metadata
+- `routes-manifest.json` - Route configuration
+
+**Note:** If you encounter a "No Output Directory named 'public' found" error on Vercel, ensure:
+1. Your `apps/web/package.json` has `"build": "next build"` (not a custom build script)
+2. The root `vercel.json` is configured correctly to use `@vercel/next` builder
+3. The output directory in Vercel settings is set to `.next` (default for Next.js)
 
 ## CI/CD Integration
 
