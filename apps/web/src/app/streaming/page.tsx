@@ -3,7 +3,7 @@
 import { useState } from 'react'
 
 export default function StreamingPage() {
-  const [currentTrack, setCurrentTrack] = useState<Track | null>(null)
+  const [currentTrack, _setCurrentTrack] = useState<Track | null>(null)
 
   return (
     <div className="min-h-screen bg-gray-900 text-white">

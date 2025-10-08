@@ -5,9 +5,9 @@ import { useState } from 'react'
 export default function StudioPage() {
   const [tracks, setTracks] = useState<Track[]>([])
   const [aiMessages, setAiMessages] = useState<string[]>([
-    '🎙️ Welcome to Virtual Studio Mode! I\'m your AI producer. Ready to create?',
+    '🎙️ Welcome to Virtual Studio Mode! I&apos;m your AI producer. Ready to create?',
   ])
-  const [vstPlugins, setVstPlugins] = useState<VstPlugin[]>([])
+  const [_vstPlugins, _setVstPlugins] = useState<VstPlugin[]>([])
 
   const addTrack = () => {
     const newTrack: Track = {
@@ -22,7 +22,7 @@ export default function StudioPage() {
     setAiMessages([...aiMessages, `✅ Added ${newTrack.name}. Let's lay down something great!`])
   }
 
-  const loadVstPlugin = (trackId: string) => {
+  const loadVstPlugin = (_trackId: string) => {
     setAiMessages([...aiMessages, '🎛️ VST Plugin loading... I recommend trying some compression on this track.'])
   }
 
@@ -82,10 +82,10 @@ export default function StudioPage() {
           <div className="mt-6">
             <h3 className="font-semibold text-sm text-gray-400 uppercase mb-2">Voice Commands</h3>
             <div className="bg-gray-700 p-3 rounded-lg text-xs space-y-1">
-              <p>💬 "Punch me in at bar 16"</p>
-              <p>💬 "Export demo mix"</p>
-              <p>💬 "Add reverb to vocals"</p>
-              <p>💬 "Suggest plugin chain"</p>
+              <p>💬 &quot;Punch me in at bar 16&quot;</p>
+              <p>💬 &quot;Export demo mix&quot;</p>
+              <p>💬 &quot;Add reverb to vocals&quot;</p>
+              <p>💬 &quot;Suggest plugin chain&quot;</p>
             </div>
           </div>
         </div>
@@ -153,7 +153,7 @@ export default function StudioPage() {
             {tracks.length === 0 && (
               <div className="text-center text-gray-500 py-20">
                 <p className="text-xl mb-2">No tracks yet</p>
-                <p>Click "Add Track" to start creating</p>
+                <p>Click &quot;Add Track&quot; to start creating</p>
               </div>
             )}
           </div>
