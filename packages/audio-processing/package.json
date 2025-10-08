@@ -1,0 +1,28 @@
+{
+  "name": "@jacameno/audio-processing",
+  "version": "1.0.0",
+  "description": "Audio processing utilities for JACAMENO platform",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "clean": "rm -rf dist",
+    "lint": "eslint src --ext .ts"
+  },
+  "keywords": [
+    "audio",
+    "processing",
+    "dsp",
+    "music",
+    "effects"
+  ],
+  "author": "JACAMENO",
+  "license": "MIT",
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "typescript": "^5.0.0"
+  },
+  "dependencies": {
+    "@jacameno/shared": "1.0.0"
+  }
+}

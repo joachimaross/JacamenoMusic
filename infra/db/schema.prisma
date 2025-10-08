@@ -1,0 +1,435 @@
+// This is your Prisma schema file for JACAMENO Platform
+// Learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// User Management
+model User {
+  id            String    @id @default(cuid())
+  email         String    @unique
+  username      String    @unique
+  name          String?
+  profileImage  String?
+  passwordHash  String
+  emailVerified Boolean   @default(false)
+  role          UserRole  @default(FREE)
+  
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  lastLoginAt   DateTime?
+
+  // Relations
+  projects           Project[]
+  tracks             Track[]
+  collaborations     ProjectCollaborator[]
+  subscriptions      Subscription[]
+  paymentMethods     PaymentMethod[]
+  sessions           Session[]
+  notifications      Notification[]
+  
+  @@index([email])
+  @@index([username])
+}
+
+enum UserRole {
+  FREE
+  PRO
+  STUDIO
+  ADMIN
+}
+
+// Session Management
+model Session {
+  id        String   @id @default(cuid())
+  userId    String
+  token     String   @unique
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+  
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  @@index([userId])
+  @@index([token])
+}
+
+// Project Management
+model Project {
+  id          String        @id @default(cuid())
+  name        String
+  description String?
+  bpm         Int           @default(120)
+  key         String?
+  genre       String?
+  status      ProjectStatus @default(DRAFT)
+  thumbnail   String?
+  isPublic    Boolean       @default(false)
+  
+  ownerId     String
+  owner       User          @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+  
+  // Relations
+  tracks          Track[]
+  collaborators   ProjectCollaborator[]
+  versions        ProjectVersion[]
+  
+  @@index([ownerId])
+  @@index([status])
+}
+
+enum ProjectStatus {
+  DRAFT
+  IN_PROGRESS
+  COMPLETED
+  PUBLISHED
+}
+
+model ProjectCollaborator {
+  id          String   @id @default(cuid())
+  projectId   String
+  userId      String
+  role        CollaboratorRole
+  
+  project     Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  createdAt   DateTime @default(now())
+  
+  @@unique([projectId, userId])
+  @@index([projectId])
+  @@index([userId])
+}
+
+enum CollaboratorRole {
+  VIEWER
+  EDITOR
+  ADMIN
+}
+
+model ProjectVersion {
+  id          String   @id @default(cuid())
+  projectId   String
+  version     Int
+  name        String?
+  data        Json
+  
+  project     Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  
+  createdAt   DateTime @default(now())
+  
+  @@unique([projectId, version])
+  @@index([projectId])
+}
+
+// Track Management
+model Track {
+  id          String    @id @default(cuid())
+  name        String
+  projectId   String
+  ownerId     String
+  type        TrackType @default(AUDIO)
+  
+  volume      Float     @default(0.0)
+  pan         Float     @default(0.0)
+  muted       Boolean   @default(false)
+  solo        Boolean   @default(false)
+  
+  audioUrl    String?
+  waveformData Json?
+  duration    Float?
+  
+  order       Int       @default(0)
+  
+  project     Project   @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  owner       User      @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  
+  // Relations
+  vstPlugins  TrackVSTPlugin[]
+  
+  @@index([projectId])
+  @@index([ownerId])
+}
+
+enum TrackType {
+  AUDIO
+  MIDI
+  INSTRUMENT
+}
+
+// VST Plugin Management
+model VSTPlugin {
+  id           String   @id @default(cuid())
+  name         String
+  manufacturer String
+  version      String
+  type         VSTType
+  path         String
+  category     String?
+  
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  
+  // Relations
+  trackPlugins TrackVSTPlugin[]
+  
+  @@unique([path])
+  @@index([name])
+  @@index([category])
+}
+
+enum VSTType {
+  VST2
+  VST3
+}
+
+model TrackVSTPlugin {
+  id          String   @id @default(cuid())
+  trackId     String
+  pluginId    String
+  order       Int
+  enabled     Boolean  @default(true)
+  parameters  Json?
+  
+  track       Track    @relation(fields: [trackId], references: [id], onDelete: Cascade)
+  plugin      VSTPlugin @relation(fields: [pluginId], references: [id], onDelete: Cascade)
+  
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  @@unique([trackId, pluginId, order])
+  @@index([trackId])
+  @@index([pluginId])
+}
+
+// Payment & Subscription
+model Customer {
+  id              String   @id @default(cuid())
+  userId          String   @unique
+  stripeCustomerId String? @unique
+  paypalCustomerId String? @unique
+  
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  
+  // Relations
+  subscriptions   Subscription[]
+  paymentMethods  PaymentMethod[]
+  payments        Payment[]
+}
+
+model PaymentMethod {
+  id              String            @id @default(cuid())
+  customerId      String
+  userId          String
+  type            PaymentMethodType
+  provider        PaymentProvider
+  externalId      String
+  isDefault       Boolean           @default(false)
+  
+  last4           String?
+  brand           String?
+  expiryMonth     Int?
+  expiryYear      Int?
+  
+  customer        Customer          @relation(fields: [customerId], references: [id], onDelete: Cascade)
+  user            User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime          @updatedAt
+  
+  @@index([customerId])
+  @@index([userId])
+}
+
+enum PaymentMethodType {
+  CARD
+  BANK_ACCOUNT
+  PAYPAL
+  APPLE_PAY
+  GOOGLE_PAY
+}
+
+enum PaymentProvider {
+  STRIPE
+  PAYPAL
+}
+
+model SubscriptionPlan {
+  id              String   @id @default(cuid())
+  name            String   @unique
+  description     String
+  amount          Int
+  currency        String   @default("usd")
+  interval        SubscriptionInterval
+  intervalCount   Int      @default(1)
+  trialPeriodDays Int?
+  features        Json
+  
+  active          Boolean  @default(true)
+  
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  
+  // Relations
+  subscriptions   Subscription[]
+  
+  @@index([name])
+}
+
+enum SubscriptionInterval {
+  DAY
+  WEEK
+  MONTH
+  YEAR
+}
+
+model Subscription {
+  id              String             @id @default(cuid())
+  customerId      String
+  userId          String
+  planId          String
+  status          SubscriptionStatus
+  
+  currentPeriodStart DateTime
+  currentPeriodEnd   DateTime
+  cancelAtPeriodEnd  Boolean         @default(false)
+  canceledAt         DateTime?
+  
+  metadata        Json?
+  
+  customer        Customer           @relation(fields: [customerId], references: [id], onDelete: Cascade)
+  user            User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+  plan            SubscriptionPlan   @relation(fields: [planId], references: [id])
+  
+  createdAt       DateTime           @default(now())
+  updatedAt       DateTime           @updatedAt
+  
+  @@index([customerId])
+  @@index([userId])
+  @@index([status])
+}
+
+enum SubscriptionStatus {
+  ACTIVE
+  PAST_DUE
+  CANCELLED
+  UNPAID
+  TRIALING
+}
+
+model Payment {
+  id              String        @id @default(cuid())
+  customerId      String
+  amount          Int
+  currency        String        @default("usd")
+  status          PaymentStatus
+  provider        PaymentProvider
+  externalId      String?
+  
+  description     String?
+  metadata        Json?
+  
+  customer        Customer      @relation(fields: [customerId], references: [id], onDelete: Cascade)
+  
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+  
+  @@index([customerId])
+  @@index([status])
+}
+
+enum PaymentStatus {
+  PENDING
+  PROCESSING
+  SUCCEEDED
+  FAILED
+  CANCELLED
+  REFUNDED
+}
+
+// Notification System
+model Notification {
+  id          String             @id @default(cuid())
+  userId      String
+  type        NotificationType
+  title       String
+  message     String
+  data        Json?
+  read        Boolean            @default(false)
+  
+  user        User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  createdAt   DateTime           @default(now())
+  
+  @@index([userId])
+  @@index([read])
+}
+
+enum NotificationType {
+  PROJECT_INVITE
+  COLLABORATION_UPDATE
+  PAYMENT_SUCCESS
+  PAYMENT_FAILED
+  SUBSCRIPTION_RENEWED
+  SUBSCRIPTION_CANCELLED
+  SYSTEM_ANNOUNCEMENT
+}
+
+// Marketplace
+model MarketplaceItem {
+  id          String              @id @default(cuid())
+  name        String
+  description String
+  type        MarketplaceItemType
+  price       Int
+  currency    String              @default("usd")
+  
+  sellerId    String
+  fileUrl     String?
+  thumbnail   String?
+  
+  active      Boolean             @default(true)
+  
+  createdAt   DateTime            @default(now())
+  updatedAt   DateTime            @updatedAt
+  
+  // Relations
+  purchases   MarketplacePurchase[]
+  
+  @@index([type])
+  @@index([active])
+}
+
+enum MarketplaceItemType {
+  PRESET
+  TEMPLATE
+  SAMPLE_PACK
+  TUTORIAL
+  PLUGIN
+}
+
+model MarketplacePurchase {
+  id          String          @id @default(cuid())
+  itemId      String
+  buyerId     String
+  amount      Int
+  
+  item        MarketplaceItem @relation(fields: [itemId], references: [id])
+  
+  createdAt   DateTime        @default(now())
+  
+  @@index([itemId])
+  @@index([buyerId])
+}
