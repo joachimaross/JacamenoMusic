@@ -64,6 +64,41 @@ AWS_SECRET_ACCESS_KEY=your-secret
 
 ### Option 1: Vercel (Recommended)
 
+This project is configured as a monorepo with the Next.js app located in `apps/web`. The `vercel.json` file at the repository root is already configured for monorepo deployment.
+
+#### Deployment via Vercel Dashboard (Recommended)
+
+1. **Connect Your Repository**
+   - Go to [Vercel Dashboard](https://vercel.com/dashboard)
+   - Click "Add New Project"
+   - Import your GitHub repository (`joachimaross/JacamenoMusic`)
+   - Vercel will automatically detect the `vercel.json` configuration
+
+2. **Configure Project Settings**
+   - **Framework Preset**: Next.js (auto-detected)
+   - **Root Directory**: Leave as `.` (root) - the `vercel.json` handles the monorepo structure
+   - **Build Command**: `cd apps/web && npm run build` (auto-configured via vercel.json)
+   - **Output Directory**: `apps/web/.next` (auto-configured via vercel.json)
+   - **Install Command**: `npm install` (auto-configured via vercel.json)
+
+3. **Configure Environment Variables**
+   - Go to Project Settings → Environment Variables
+   - Add the following variables for all environments (Production, Preview, Development):
+     ```
+     NEXT_PUBLIC_API_URL=https://api.jacameno.com
+     NEXT_PUBLIC_WS_URL=wss://api.jacameno.com
+     NEXT_PUBLIC_AI_SERVICE_URL=https://ai.jacameno.com
+     ```
+
+4. **Deploy**
+   - Click "Deploy"
+   - Vercel will automatically deploy on every push to the main branch
+   - Preview deployments are created for pull requests
+
+#### Deployment via Vercel CLI (Optional)
+
+For local testing or manual deployments:
+
 1. **Install Vercel CLI**
    ```bash
    npm install -g vercel
@@ -74,15 +109,65 @@ AWS_SECRET_ACCESS_KEY=your-secret
    vercel login
    ```
 
-3. **Deploy**
+3. **Link Project (First Time Only)**
    ```bash
-   cd apps/web
+   # From repository root
+   vercel link
+   ```
+   - Select your team/account
+   - Link to existing project or create new one
+   - Confirm the project settings
+
+4. **Deploy to Preview**
+   ```bash
+   # From repository root
+   vercel
+   ```
+   This creates a preview deployment for testing.
+
+5. **Deploy to Production**
+   ```bash
+   # From repository root
    vercel --prod
    ```
+   This deploys to your production domain.
 
-4. **Configure Environment Variables**
-   - Go to Vercel Dashboard → Project → Settings → Environment Variables
-   - Add all required variables
+6. **Configure Environment Variables via CLI**
+   ```bash
+   # Set production environment variable
+   vercel env add NEXT_PUBLIC_API_URL production
+   
+   # Set for all environments
+   vercel env add NEXT_PUBLIC_WS_URL
+   ```
+
+#### Monorepo Configuration
+
+The repository includes a `vercel.json` file that configures the monorepo deployment:
+
+```json
+{
+  "buildCommand": "cd apps/web && npm run build",
+  "outputDirectory": "apps/web/.next",
+  "devCommand": "cd apps/web && npm run dev",
+  "installCommand": "npm install",
+  "framework": "nextjs"
+}
+```
+
+This configuration:
+- Installs dependencies from the root package.json (includes workspace dependencies)
+- Builds the Next.js app located in `apps/web`
+- Outputs the build to `apps/web/.next`
+- Automatically handles the monorepo structure
+
+#### Verifying Deployment
+
+After deployment, verify your application:
+- Check the deployment URL provided by Vercel
+- Test all critical features
+- Verify environment variables are correctly set
+- Check the build logs for any warnings or errors
 
 ### Option 2: AWS Amplify
 
