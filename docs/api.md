@@ -735,3 +735,234 @@ For API support and questions:
 - Documentation: https://docs.jacameno.com
 - GitHub Issues: https://github.com/joachimaross/JacamenoMusic/issues
 - Email: api@jacameno.com
+
+---
+
+## AI Microservices API
+
+The AI Microservices provide specialized endpoints for AI-powered audio processing, lyrics generation, vocal coaching, and mixing services.
+
+### Base URL
+
+- **AI Services**: `http://localhost:8000` (Development)
+- **Production**: `https://ai.jacameno.com`
+
+### Health Check
+
+```http
+GET /health
+```
+
+Response:
+```json
+{
+  "status": "healthy",
+  "service": "ai-microservices"
+}
+```
+
+### Lyrics Generation
+
+Generate AI-powered lyrics based on style, theme, and mood.
+
+```http
+POST /api/lyrics
+Content-Type: application/json
+
+{
+  "style": "trap",
+  "theme": "success",
+  "mood": "confident",
+  "artist": "Drake",
+  "bpm": 140
+}
+```
+
+Response:
+```json
+{
+  "lyrics": "[Verse 1]\nLiving life in the trap lane...",
+  "rhyme_scheme": "AABB",
+  "suggestions": [
+    "Consider adding a bridge section",
+    "The flow matches well with the BPM",
+    "Try emphasizing the hook more"
+  ]
+}
+```
+
+### Vocal Analysis
+
+Analyze vocal performance for pitch accuracy, timing, and breath control.
+
+```http
+POST /api/vocal-analysis
+Content-Type: multipart/form-data
+
+file: <audio file>
+```
+
+Response:
+```json
+{
+  "pitch_accuracy": 87.5,
+  "timing_score": 92.0,
+  "breath_control": "Good",
+  "recommendations": [
+    "Work on sustaining notes longer",
+    "Practice breath control exercises",
+    "Consider vocal warm-ups before recording",
+    "Slight pitch correction needed in chorus"
+  ],
+  "overall_score": 89.8
+}
+```
+
+### AI Mixing
+
+Apply AI-powered mixing with EQ, compression, and effects.
+
+```http
+POST /api/mixing
+Content-Type: application/json
+
+{
+  "track_id": "track123",
+  "genre": "trap",
+  "apply_eq": true,
+  "apply_compression": true,
+  "reverb_amount": 0.3
+}
+```
+
+Response:
+```json
+{
+  "success": true,
+  "suggestions": [
+    "EQ looks good, vocals are clear and present",
+    "Compression helps control dynamics nicely",
+    "Reverb adds nice space without washing out the vocal"
+  ],
+  "applied_effects": [
+    "EQ: Boosted 3kHz for presence, cut 200Hz for clarity",
+    "Compression: Ratio 4:1, threshold -18dB",
+    "Reverb: 30% wet"
+  ],
+  "download_url": "/download/mixed_track123.wav"
+}
+```
+
+### AI Mastering
+
+Master track with AI-powered loudness optimization and limiting.
+
+```http
+POST /api/mastering
+Content-Type: application/json
+
+{
+  "track_id": "track123",
+  "target_loudness": -14.0,
+  "preset": "streaming"
+}
+```
+
+Response:
+```json
+{
+  "success": true,
+  "final_loudness": -14.0,
+  "download_url": "/download/mastered_track123.wav"
+}
+```
+
+### Audio Processing
+
+Process audio file and extract features.
+
+```http
+POST /api/audio/process
+Content-Type: multipart/form-data
+
+file: <audio file>
+```
+
+Response:
+```json
+{
+  "filename": "track.wav",
+  "duration": 180.5,
+  "sample_rate": 44100,
+  "channels": 2,
+  "format": "wav",
+  "features": {
+    "tempo": 120,
+    "key": "C major",
+    "loudness": -12.5,
+    "spectral_centroid": 2500.0
+  }
+}
+```
+
+### VST Plugin Suggestions
+
+Get VST plugin recommendations based on genre and track type.
+
+```http
+GET /api/vst/suggestions?genre=trap&track_type=vocals
+```
+
+Response:
+```json
+{
+  "genre": "trap",
+  "track_type": "vocals",
+  "recommended_plugins": [
+    "Auto-Tune Pro",
+    "Waves CLA Vocals",
+    "FabFilter Pro-Q 3"
+  ]
+}
+```
+
+### Error Handling
+
+All AI endpoints return standard HTTP status codes:
+
+- `200 OK` - Request successful
+- `400 Bad Request` - Invalid parameters
+- `500 Internal Server Error` - Server error (logged to Sentry)
+
+Error response format:
+```json
+{
+  "detail": "Error message description"
+}
+```
+
+### Rate Limiting
+
+AI endpoints have rate limits to ensure fair usage:
+- **Free tier**: 100 requests/hour
+- **Pro tier**: 1000 requests/hour
+- **Enterprise**: Unlimited
+
+### Environment Variables
+
+Required environment variables for AI services:
+
+```env
+# Sentry error monitoring (optional but recommended)
+SENTRY_DSN=https://your-sentry-dsn@sentry.io/project-id
+ENVIRONMENT=production
+
+# OpenAI API for advanced AI features (optional)
+OPENAI_API_KEY=your-openai-api-key
+
+# AWS S3 for processed audio storage (optional)
+AWS_ACCESS_KEY_ID=your-aws-access-key
+AWS_SECRET_ACCESS_KEY=your-aws-secret-key
+AWS_REGION=us-east-1
+AWS_S3_BUCKET=jacameno-ai-processed
+```

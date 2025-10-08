@@ -1,6 +1,13 @@
 {
-  "builds": [
-    { "src": "apps/web/package.json", "use": "@vercel/next" }
-  ],
-  "outputDirectory": ".next"
+  "buildCommand": "cd apps/web && yarn build",
+  "outputDirectory": "apps/web/.next",
+  "framework": "nextjs",
+  "installCommand": "yarn install",
+  "devCommand": "cd apps/web && yarn dev",
+  "rewrites": [
+    {
+      "source": "/(.*)",
+      "destination": "/apps/web/$1"
+    }
+  ]
 }
