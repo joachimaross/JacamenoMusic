@@ -1,0 +1,12 @@
+#!/usr/bin/env sh
+. "$(dirname -- "$0")/_/husky.sh"
+
+# Run type check
+echo "🔍 Running TypeScript type check..."
+yarn workspaces foreach -A --no-private --verbose run build || exit 1
+
+# Run tests
+echo "🧪 Running tests..."
+yarn test || exit 1
+
+echo "✅ Pre-push checks passed!"

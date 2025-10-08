@@ -17,8 +17,14 @@
     "build:web": "yarn workspace @jacameno/web build",
     "test": "yarn workspaces run test",
     "test:web": "yarn workspace @jacameno/web test",
+    "test:coverage": "yarn workspaces run test:coverage",
     "lint": "yarn workspaces run lint",
-    "clean": "yarn workspaces run clean && rm -rf node_modules"
+    "lint:fix": "yarn workspaces run lint --fix",
+    "type-check": "yarn workspaces foreach -A --no-private run build",
+    "format": "prettier --write \"**/*.{ts,tsx,js,jsx,json,md,yml,yaml}\"",
+    "format:check": "prettier --check \"**/*.{ts,tsx,js,jsx,json,md,yml,yaml}\"",
+    "clean": "yarn workspaces run clean && rm -rf node_modules",
+    "prepare": "husky"
   },
   "keywords": [
     "music",
@@ -35,5 +41,26 @@
     "npm": ">=9.0.0",
     "yarn": ">=1.22.0"
   },
-  "packageManager": "yarn@1.22.19"
+  "packageManager": "yarn@1.22.19",
+  "devDependencies": {
+    "@testing-library/jest-dom": "^6.9.1",
+    "@testing-library/react": "^16.3.0",
+    "@testing-library/user-event": "^14.6.1",
+    "@types/jest": "^30.0.0",
+    "husky": "^9.1.7",
+    "jest": "^30.2.0",
+    "jest-environment-jsdom": "^30.2.0",
+    "lint-staged": "^16.2.3",
+    "prettier": "^3.6.2",
+    "ts-jest": "^29.4.4"
+  },
+  "lint-staged": {
+    "*.{ts,tsx,js,jsx}": [
+      "eslint --fix",
+      "prettier --write"
+    ],
+    "*.{json,md,yml,yaml}": [
+      "prettier --write"
+    ]
+  }
 }

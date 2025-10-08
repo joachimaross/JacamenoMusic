@@ -1,0 +1,61 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": ["config:base", ":dependencyDashboard", ":semanticCommits", ":preserveSemverRanges"],
+  "timezone": "UTC",
+  "schedule": ["after 10pm every weekday", "before 5am every weekday", "every weekend"],
+  "labels": ["dependencies"],
+  "assignees": ["joachimaross"],
+  "packageRules": [
+    {
+      "description": "Automerge patch updates for non-major dependencies",
+      "matchUpdateTypes": ["patch"],
+      "automerge": true,
+      "automergeType": "pr",
+      "automergeStrategy": "squash"
+    },
+    {
+      "description": "Automerge minor updates for dev dependencies",
+      "matchDepTypes": ["devDependencies"],
+      "matchUpdateTypes": ["minor"],
+      "automerge": true,
+      "automergeType": "pr",
+      "automergeStrategy": "squash"
+    },
+    {
+      "description": "Group all TypeScript related packages",
+      "matchPackagePatterns": ["^@typescript-eslint/", "^typescript$"],
+      "groupName": "TypeScript"
+    },
+    {
+      "description": "Group all ESLint packages",
+      "matchPackagePatterns": ["^eslint"],
+      "groupName": "ESLint"
+    },
+    {
+      "description": "Group all Next.js packages",
+      "matchPackagePatterns": ["^next"],
+      "groupName": "Next.js"
+    },
+    {
+      "description": "Group all React packages",
+      "matchPackagePatterns": ["^react", "^@types/react"],
+      "groupName": "React"
+    },
+    {
+      "description": "Require approval for major updates",
+      "matchUpdateTypes": ["major"],
+      "automerge": false,
+      "labels": ["dependencies", "major-update"]
+    }
+  ],
+  "vulnerabilityAlerts": {
+    "labels": ["security"],
+    "assignees": ["joachimaross"],
+    "automerge": false
+  },
+  "prConcurrentLimit": 5,
+  "prHourlyLimit": 2,
+  "rebaseWhen": "conflicted",
+  "semanticCommits": "enabled",
+  "commitMessagePrefix": "chore(deps):"
+}
