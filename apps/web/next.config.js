@@ -2,9 +2,8 @@
 const nextConfig = {
   reactStrictMode: true,
   transpilePackages: ['@jacameno/shared', '@jacameno/ui'],
-  experimental: {
-    serverActions: true,
-  },
+  // Server Actions are enabled by default in Next.js 14
+  // experimental.serverActions config is no longer needed
   images: {
     domains: ['jacameno-music.s3.amazonaws.com'],
   },
