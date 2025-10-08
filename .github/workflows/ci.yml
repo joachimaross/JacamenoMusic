@@ -69,7 +69,7 @@ jobs:
           # This will fail if coverage is below thresholds set in jest.config.js
 
       - name: Upload coverage to Codecov
-        uses: codecov/codecov-action@v3
+        uses: codecov/codecov-action@v5
         with:
           files: ./coverage/lcov.info
           flags: unittests
@@ -119,7 +119,7 @@ jobs:
           pytest --cov=. --cov-report=xml --cov-report=term || echo "No tests to run yet"
 
       - name: Upload coverage
-        uses: codecov/codecov-action@v3
+        uses: codecov/codecov-action@v5
         with:
           files: ./services/ai-microservices/coverage.xml
           flags: ai-services
