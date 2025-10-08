@@ -13,8 +13,12 @@ This guide provides step-by-step instructions for deploying the JACAMENO Next.js
 - [Environment Variables](#environment-variables)
 - [Preview Deployments](#preview-deployments)
 - [Troubleshooting](#troubleshooting)
+  - [Common Deployment Issues and Prevention](#common-deployment-issues-and-prevention)
 - [Local Development](#local-development)
 - [CI/CD Integration](#cicd-integration)
+- [Best Practices for Contributors](#best-practices-for-contributors)
+- [Additional Resources](#additional-resources)
+- [Support](#support)
 
 ## Overview
 
@@ -607,6 +611,108 @@ For issues or questions:
 - **GitHub Issues:** [Create an issue](https://github.com/joachimaross/JacamenoMusic/issues)
 - **Vercel Support:** [Vercel Help](https://vercel.com/help)
 - **Team Contact:** See repository README
+
+---
+
+## Best Practices for Contributors
+
+### Before Committing Code
+
+Always run these checks locally before pushing:
+
+```bash
+# 1. Lint your code
+cd apps/web
+yarn lint
+
+# 2. Check types
+npx tsc --noEmit
+
+# 3. Test build (optional but recommended)
+yarn build
+```
+
+### Configuration Changes
+
+When modifying configuration files, be aware of these requirements:
+
+#### Root `package.json`
+- **MUST** have `"private": true` for workspaces to function
+- Do not remove the workspaces field
+- CI will fail if this is missing
+
+#### `next.config.js`
+- Avoid deprecated configuration options
+- Check [Next.js documentation](https://nextjs.org/docs) for current syntax
+- CI validates the config on every PR
+- Server Actions are enabled by default in Next.js 14+ (no config needed)
+
+#### ESLint Configuration
+- Use the Next.js ESLint plugin (`apps/web/.eslintrc.json`)
+- Extends `next/core-web-vitals` and `next/typescript`
+- Do not remove or replace with custom config unless absolutely necessary
+- The Next.js plugin provides proper TypeScript/React parsing
+
+### Understanding CI Checks
+
+The repository has automated checks that run on every PR:
+
+1. **pr-quality-checks.yml** - Validates configuration and code quality
+   - ✅ Must pass before merging
+   - Checks: workspace config, Next.js config, ESLint, TypeScript
+
+2. **vercel-build-test.yml** - Tests deployment build
+   - May fail in CI due to network restrictions (Google Fonts)
+   - This is expected and doesn't affect actual Vercel deployments
+
+### Handling Peer Dependency Warnings
+
+When you see warnings like:
+```
+warning "@jacameno/mobile > react-native-web@0.19.13" has unmet peer dependency "react-dom@^18.0.0"
+```
+
+**What to do:**
+- ✅ **Ignore these warnings** - they are safe for web deployments
+- ❌ **Do not add mobile dependencies to the web app** - keep them separate
+- ❌ **Do not add web dependencies to the mobile app** - keep them separate
+
+**Why these warnings exist:**
+- The monorepo contains both web (Next.js) and mobile (React Native) apps
+- Mobile apps have different peer dependencies than web apps
+- Yarn shows all warnings across the entire workspace
+- Each app has the correct dependencies in its own `package.json`
+
+### Updating Dependencies
+
+When updating Next.js or other major dependencies:
+
+1. Check the [Next.js upgrade guide](https://nextjs.org/docs/upgrading)
+2. Review breaking changes and deprecated features
+3. Update configuration as needed (like we did with `serverActions`)
+4. Test locally before pushing
+5. Monitor CI checks after pushing
+
+### Emergency: CI Failing After Merge
+
+If CI starts failing on main branch:
+
+1. **Check Recent Changes:**
+   ```bash
+   git log --oneline -10
+   ```
+
+2. **Common Fixes:**
+   - Verify `package.json` has `"private": true`
+   - Check `next.config.js` for deprecated options
+   - Ensure `.eslintrc.json` exists in `apps/web`
+   - Run `yarn install` to update lockfile
+
+3. **Quick Rollback:**
+   ```bash
+   git revert <commit-hash>
+   git push origin main
+   ```
 
 ---
 
