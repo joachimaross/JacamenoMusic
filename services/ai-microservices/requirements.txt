@@ -13,5 +13,5 @@ boto3==1.29.7
 redis==5.0.1
 psycopg2-binary==2.9.9
 sqlalchemy==2.0.23
-sentry-sdk[fastapi]==1.40.0
+sentry-sdk[fastapi]==2.40.0
 requests==2.31.0
