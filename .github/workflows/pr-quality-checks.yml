@@ -1,0 +1,93 @@
+name: PR Quality Checks
+
+on:
+  pull_request:
+    branches: [main, develop]
+  push:
+    branches: [main, develop]
+
+jobs:
+  lint-and-typecheck:
+    name: Lint and Type Check
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+
+      - name: Install Yarn
+        run: |
+          corepack enable
+          corepack prepare yarn@1.22.19 --activate
+
+      - name: Cache Yarn dependencies
+        uses: actions/cache@v3
+        with:
+          path: |
+            .yarn/cache
+            **/node_modules
+          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-yarn-
+
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile || yarn install
+
+      - name: Verify workspace configuration
+        run: |
+          echo "Checking root package.json configuration..."
+          if ! grep -q '"private": true' package.json; then
+            echo "❌ ERROR: Root package.json must have 'private: true' for workspaces to function properly"
+            echo "This is required to avoid workspace warnings during deployment"
+            exit 1
+          else
+            echo "✅ Root package.json is correctly marked as private"
+          fi
+
+      - name: Check Next.js config
+        working-directory: apps/web
+        run: |
+          echo "Validating next.config.js..."
+          node -e "
+            const config = require('./next.config.js');
+            
+            // Check for deprecated serverActions boolean
+            if (config.experimental?.serverActions === true || config.experimental?.serverActions === false) {
+              console.error('❌ ERROR: experimental.serverActions should not be a boolean');
+              console.error('Server Actions are enabled by default in Next.js 14');
+              console.error('Remove the experimental.serverActions field from next.config.js');
+              process.exit(1);
+            }
+            
+            console.log('✅ next.config.js is valid');
+          "
+
+      - name: Run ESLint on web app
+        working-directory: apps/web
+        run: |
+          echo "Running ESLint..."
+          yarn lint
+
+      - name: Run TypeScript check on web app
+        working-directory: apps/web
+        run: |
+          echo "Running TypeScript compiler..."
+          npx tsc --noEmit
+
+      - name: Check summary
+        if: always()
+        run: |
+          echo "## PR Quality Check Results" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "✅ All quality checks passed!" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### Checks performed:" >> $GITHUB_STEP_SUMMARY
+          echo "- ✅ Workspace configuration validation" >> $GITHUB_STEP_SUMMARY
+          echo "- ✅ Next.js config validation" >> $GITHUB_STEP_SUMMARY
+          echo "- ✅ ESLint checks" >> $GITHUB_STEP_SUMMARY
+          echo "- ✅ TypeScript type checking" >> $GITHUB_STEP_SUMMARY

@@ -190,6 +190,149 @@ vercel inspect <deployment-url>
 
 ## Troubleshooting
 
+### Common Deployment Issues and Prevention
+
+This section documents recurring deployment issues and how to prevent them before they cause build failures.
+
+#### Issue: Peer Dependency Warnings from @jacameno/mobile
+
+**Symptom:**
+```
+warning "@jacameno/mobile > react-native-web@0.19.13" has unmet peer dependency "react-dom@^18.0.0"
+warning "@jacameno/mobile > react-native-reanimated@3.3.0" has unmet peer dependency "@babel/plugin-proposal-nullish-coalescing-operator@^7.0.0-0"
+```
+
+**Explanation:**
+- These warnings occur because `@jacameno/mobile` (React Native app) has dependencies that expect certain peer dependencies
+- For web deployments (Next.js), these are **safe to ignore** as React Native mobile dependencies are not used in the web build
+- The web app has its own `react-dom` in `apps/web/package.json`
+
+**Prevention:**
+- No action needed - these warnings do not affect web deployments
+- Do not add mobile-specific peer dependencies to the web app
+- Keep mobile and web dependencies separate in their respective `package.json` files
+
+**Documentation:**
+- These warnings are expected in a monorepo with both web and mobile apps
+- Vercel builds only the web app and will not be affected by mobile peer dependencies
+
+---
+
+#### Issue: Workspaces Configuration Warning
+
+**Symptom:**
+```
+warning Workspaces can only be enabled in private projects.
+```
+
+**Explanation:**
+- Yarn workspaces require the root `package.json` to have `"private": true`
+- This is already configured but removing it will cause this warning
+
+**Prevention:**
+- ✅ Root `package.json` has `"private": true` - **DO NOT REMOVE THIS**
+- A CI check (`pr-quality-checks.yml`) validates this on every PR
+- If you see this warning during local development, verify root `package.json` has `"private": true`
+
+**Fix if removed:**
+```json
+{
+  "name": "jacameno-music",
+  "private": true,
+  "workspaces": ["apps/*", "packages/*", "services/*"]
+}
+```
+
+---
+
+#### Issue: next.config.js - Invalid experimental.serverActions
+
+**Symptom:**
+```
+⚠ Invalid next.config.js options detected: 
+⚠ Expected object, received boolean at "experimental.serverActions"
+⚠ Server Actions are available by default now, experimental.serverActions option can be safely removed.
+```
+
+**Explanation:**
+- Next.js 13 required `experimental: { serverActions: true }` to enable Server Actions
+- Next.js 14+ has Server Actions enabled by default
+- The boolean config is now invalid - should be removed or changed to an object
+
+**Prevention:**
+- ✅ `next.config.js` has been updated to remove the deprecated config
+- A CI check validates `next.config.js` on every PR
+- Always refer to [Next.js upgrade guides](https://nextjs.org/docs/upgrading) when updating Next.js versions
+
+**Fix if encountered:**
+Remove the experimental.serverActions field entirely:
+```javascript
+// ❌ Old (invalid in Next.js 14+)
+experimental: {
+  serverActions: true,
+}
+
+// ✅ New (Server Actions enabled by default)
+// Just remove the field completely
+```
+
+---
+
+#### Issue: ESLint - Next.js Plugin Not Detected
+
+**Symptom:**
+```
+⚠ The Next.js plugin was not detected in your ESLint configuration
+Parsing error: Unexpected token {
+```
+
+**Explanation:**
+- The Next.js ESLint plugin provides proper TypeScript and React parsing for Next.js projects
+- Without it, ESLint cannot parse JSX/TSX files correctly
+- This causes false "parsing error" messages during linting
+
+**Prevention:**
+- ✅ `apps/web/.eslintrc.json` now includes the Next.js ESLint configuration
+- A CI check runs ESLint on every PR to catch issues early
+- The configuration includes TypeScript support automatically
+
+**Current Configuration:**
+`apps/web/.eslintrc.json`:
+```json
+{
+  "extends": ["next/core-web-vitals", "next/typescript"]
+}
+```
+
+**Migration from Legacy ESLint:**
+If you had a custom `.eslintrc.js` file before, the new config is simpler and recommended by Next.js.
+
+---
+
+#### Issue: TypeScript/JSX Parse Errors in CI
+
+**Symptom:**
+- Files like `layout.tsx`, `page.tsx`, `streaming/page.tsx`, `studio/page.tsx` fail to parse
+- Errors like "Unexpected token" in TSX files
+
+**Explanation:**
+- This happens when ESLint doesn't have proper TypeScript/React parser configured
+- The Next.js ESLint plugin automatically handles this
+
+**Prevention:**
+- ✅ CI workflow (`.github/workflows/pr-quality-checks.yml`) runs lint and TypeScript checks
+- TypeScript compiler (`tsc --noEmit`) validates all types before deployment
+- ESLint with Next.js plugin validates syntax
+- Both checks must pass before code can be merged to main
+
+**How CI Prevents This:**
+1. Every PR triggers automatic lint and type checks
+2. Failing checks block the PR from being merged
+3. Contributors get immediate feedback on syntax errors
+4. Prevents broken code from reaching production
+
+---
+
 ### Build Failures
 
 #### Issue: "Module not found" errors
@@ -318,17 +461,103 @@ This will start the production server at [http://localhost:3000](http://localhos
 
 ## CI/CD Integration
 
-### GitHub Actions Workflow
+### GitHub Actions Workflows
 
-A GitHub Actions workflow (`.github/workflows/vercel-build-test.yml`) runs automatically to verify deployment readiness:
+The repository includes multiple GitHub Actions workflows to ensure code quality and deployment readiness:
 
-- **Triggers:** On push to main/develop branches and pull requests
-- **Steps:**
+#### 1. PR Quality Checks (`.github/workflows/pr-quality-checks.yml`)
+
+**Purpose:** Validates code quality, configuration, and prevents common deployment issues
+
+**Triggers:** 
+- Pull requests to `main` or `develop` branches
+- Pushes to `main` or `develop` branches
+
+**Checks Performed:**
+1. **Workspace Configuration Validation**
+   - Ensures root `package.json` has `"private": true`
+   - Prevents workspace configuration issues
+
+2. **Next.js Config Validation**
+   - Checks for deprecated `experimental.serverActions` boolean
+   - Ensures config is compatible with Next.js 14+
+
+3. **ESLint Checks**
+   - Runs linting on all TypeScript/TSX files
+   - Catches syntax errors and code quality issues
+   - Uses Next.js ESLint plugin for proper parsing
+
+4. **TypeScript Type Checking**
+   - Runs `tsc --noEmit` to validate all types
+   - Catches type errors before deployment
+   - No build artifacts generated (noEmit flag)
+
+**Why This Matters:**
+- Catches deployment-breaking issues early in development
+- Prevents invalid configurations from reaching production
+- Ensures consistent code quality across contributions
+- Provides immediate feedback to contributors
+
+#### 2. Vercel Build Test (`.github/workflows/vercel-build-test.yml`)
+
+**Purpose:** Tests that the web app can build successfully for Vercel deployment
+
+**Triggers:** On push to main/develop branches and pull requests
+
+**Steps:**
   1. Install dependencies with `yarn install`
   2. Build the web app with `yarn build`
   3. Run tests with `yarn test` (if tests exist)
 
 **Note:** The CI build may fail in restricted environments due to external dependencies (e.g., Google Fonts). This is expected and does not affect Vercel deployments, which have proper internet access.
+
+#### 3. Backend Tests (`.github/workflows/ci.yml`)
+
+**Purpose:** Tests backend API and AI services (separate from web deployment)
+
+**Services:** Runs PostgreSQL and Redis for integration tests
+
+---
+
+### How to Use CI/CD Effectively
+
+#### For Contributors
+
+1. **Before Creating a PR:**
+   ```bash
+   # Run lint locally
+   cd apps/web
+   yarn lint
+   
+   # Run type check locally
+   npx tsc --noEmit
+   ```
+
+2. **After Creating a PR:**
+   - Check the GitHub Actions status
+   - All checks must pass before merging
+   - Fix any issues reported by the CI checks
+
+3. **Common CI Failures:**
+   - **ESLint errors:** Fix code style issues in reported files
+   - **TypeScript errors:** Fix type issues in reported files
+   - **Config validation:** Check `next.config.js` and root `package.json`
+
+#### For Maintainers
+
+1. **Review CI Results:**
+   - All checks must be green before merging
+   - Review any warnings even if checks pass
+   - Ensure build artifacts are generated correctly
+
+2. **Merge Requirements:**
+   - ✅ All CI checks passing
+   - ✅ No TypeScript errors
+   - ✅ ESLint passing (warnings acceptable, errors not)
+   - ✅ Code review approved
+   - ✅ No merge conflicts
+
+---
 
 ### Vercel Integration with GitHub
 
