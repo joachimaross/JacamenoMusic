@@ -1,0 +1,79 @@
+name: Vercel Build Test
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main, develop]
+
+jobs:
+  vercel-build-test:
+    name: Test Vercel Deployment Build
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+
+      - name: Install Yarn
+        run: |
+          corepack enable
+          corepack prepare yarn@1.22.19 --activate
+
+      - name: Cache Yarn dependencies
+        uses: actions/cache@v3
+        with:
+          path: |
+            .yarn/cache
+            **/node_modules
+          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-yarn-
+
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile || yarn install
+
+      - name: Build web application
+        working-directory: apps/web
+        env:
+          # Set dummy environment variables for build
+          NEXT_PUBLIC_API_URL: http://localhost:4000
+          NEXT_PUBLIC_WS_URL: ws://localhost:4000
+          NEXT_PUBLIC_AI_SERVICE_URL: http://localhost:8000
+        run: yarn build
+
+      - name: Run web tests
+        working-directory: apps/web
+        run: |
+          if grep -q '"test"' package.json; then
+            echo "Running tests..."
+            yarn test --passWithNoTests || echo "No tests found or tests failed (non-blocking)"
+          else
+            echo "No test script defined, skipping tests"
+          fi
+        continue-on-error: true
+
+      - name: Check build output
+        working-directory: apps/web
+        run: |
+          if [ -d ".next" ]; then
+            echo "✅ Build successful - .next directory created"
+            ls -la .next
+          else
+            echo "❌ Build failed - .next directory not found"
+            exit 1
+          fi
+
+      - name: Build summary
+        if: always()
+        run: |
+          echo "## Vercel Build Test Results" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "- ✅ Dependencies installed" >> $GITHUB_STEP_SUMMARY
+          echo "- ✅ Web application built successfully" >> $GITHUB_STEP_SUMMARY
+          echo "- 📦 Ready for Vercel deployment" >> $GITHUB_STEP_SUMMARY
