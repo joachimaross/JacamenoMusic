@@ -50,7 +50,7 @@ Works seamlessly on web, iOS, and Android with offline creation mode.
 
 ### Prerequisites
 - Node.js >= 18.0.0
-- npm >= 9.0.0
+- npm >= 9.0.0 or Yarn >= 1.22.0
 - Python >= 3.9 (for AI services)
 
 ### Installation
@@ -61,16 +61,20 @@ git clone https://github.com/joachimaross/JacamenoMusic.git
 cd JacamenoMusic
 
 # Install dependencies
+# Using Yarn (recommended for monorepo)
+yarn install
+
+# Or using npm
 npm install
 
 # Start web application
-npm run dev
+yarn dev   # or npm run dev
 
 # Start mobile app (separate terminal)
-npm run dev:mobile
+yarn dev:mobile   # or npm run dev:mobile
 
 # Start backend API (separate terminal)
-npm run dev:api
+yarn dev:api   # or npm run dev:api
 
 # Start AI microservices (separate terminal)
 cd services/ai-microservices
@@ -118,6 +122,7 @@ Comprehensive documentation is available in the [docs](./docs) directory:
 - [API Reference](./docs/api.md)
 - [Architecture Guide](./docs/architecture.md)
 - [Deployment Guide](./docs/deployment.md)
+- [**Vercel Deployment Guide**](./DEPLOYMENT.md) - Quick guide for deploying to Vercel
 
 ## 🎯 Core Capabilities
 
@@ -191,31 +196,31 @@ query {
 
 ```bash
 # Run all tests
-npm test
+yarn test   # or npm test
 
 # Test specific workspace
-npm test --workspace=apps/web
-npm test --workspace=services/api
+yarn test:web   # or npm test --workspace=apps/web
+yarn workspace @jacameno/api test   # or npm test --workspace=services/api
 ```
 
 ## 📦 Building
 
 ```bash
 # Build all projects
-npm run build
+yarn build   # or npm run build
 
 # Build specific workspace
-npm run build --workspace=apps/web
+yarn build:web   # or npm run build --workspace=apps/web
 ```
 
 ## 🚀 Deployment
 
-- **Web**: Deploy to Vercel, Netlify, or AWS
+- **Web**: Deploy to Vercel (recommended), Netlify, or AWS
 - **API**: Deploy to AWS EC2, Heroku, or DigitalOcean
 - **AI Services**: Deploy to AWS Lambda or Google Cloud Run
 - **Mobile**: Build with Expo EAS and submit to stores
 
-See [Deployment Guide](./docs/deployment.md) for detailed instructions.
+See [Vercel Deployment Guide](./DEPLOYMENT.md) for quick Vercel deployment or [Full Deployment Guide](./docs/deployment.md) for all deployment options.
 
 ## 🤝 Contributing
 

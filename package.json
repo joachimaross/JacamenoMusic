@@ -9,14 +9,16 @@
     "services/*"
   ],
   "scripts": {
-    "dev": "npm run dev --workspace=apps/web",
-    "dev:mobile": "npm run dev --workspace=apps/mobile",
-    "dev:api": "npm run dev --workspace=services/api",
-    "dev:ai": "npm run dev --workspace=services/ai",
-    "build": "npm run build --workspaces",
-    "test": "npm run test --workspaces",
-    "lint": "npm run lint --workspaces",
-    "clean": "npm run clean --workspaces && rm -rf node_modules"
+    "dev": "yarn workspace @jacameno/web dev",
+    "dev:mobile": "yarn workspace @jacameno/mobile dev",
+    "dev:api": "yarn workspace @jacameno/api dev",
+    "dev:ai": "yarn workspace @jacameno/ai dev",
+    "build": "yarn workspaces run build",
+    "build:web": "yarn workspace @jacameno/web build",
+    "test": "yarn workspaces run test",
+    "test:web": "yarn workspace @jacameno/web test",
+    "lint": "yarn workspaces run lint",
+    "clean": "yarn workspaces run clean && rm -rf node_modules"
   },
   "keywords": [
     "music",
@@ -30,6 +32,8 @@
   "license": "MIT",
   "engines": {
     "node": ">=18.0.0",
-    "npm": ">=9.0.0"
-  }
+    "npm": ">=9.0.0",
+    "yarn": ">=1.22.0"
+  },
+  "packageManager": "yarn@1.22.19"
 }
