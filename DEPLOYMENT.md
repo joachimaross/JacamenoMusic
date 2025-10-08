@@ -325,8 +325,10 @@ A GitHub Actions workflow (`.github/workflows/vercel-build-test.yml`) runs autom
 - **Triggers:** On push to main/develop branches and pull requests
 - **Steps:**
   1. Install dependencies with `yarn install`
-  2. Build the web app with `yarn build:web`
-  3. Run tests with `yarn test:web` (if tests exist)
+  2. Build the web app with `yarn build`
+  3. Run tests with `yarn test` (if tests exist)
+
+**Note:** The CI build may fail in restricted environments due to external dependencies (e.g., Google Fonts). This is expected and does not affect Vercel deployments, which have proper internet access.
 
 ### Vercel Integration with GitHub
 
