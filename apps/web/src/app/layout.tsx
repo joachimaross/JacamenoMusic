@@ -1,8 +1,6 @@
 import type { Metadata } from 'next'
-import { Inter } from 'next/font/google'
 import '../styles/globals.css'
-
-const inter = Inter({ subsets: ['latin'] })
+import Navigation from '../components/Navigation'
 
 export const metadata: Metadata = {
   title: 'JACAMENO - AI Music Production & Streaming',
@@ -17,7 +15,10 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body className={inter.className}>{children}</body>
+      <body className="font-sans antialiased">
+        <Navigation />
+        {children}
+      </body>
     </html>
   )
 }
