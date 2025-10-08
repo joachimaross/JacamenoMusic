@@ -7,6 +7,7 @@ Thank you for your interest in contributing to JACAMENO! This document provides 
 ### Reporting Bugs
 
 If you find a bug, please create an issue on GitHub with:
+
 - Clear title and description
 - Steps to reproduce
 - Expected vs actual behavior
@@ -16,6 +17,7 @@ If you find a bug, please create an issue on GitHub with:
 ### Suggesting Features
 
 Feature suggestions are welcome! Please:
+
 - Check if the feature has already been requested
 - Provide a clear use case
 - Explain how it benefits users
@@ -24,12 +26,14 @@ Feature suggestions are welcome! Please:
 ### Code Contributions
 
 1. **Fork the Repository**
+
    ```bash
    git clone https://github.com/joachimaross/JacamenoMusic.git
    cd JacamenoMusic
    ```
 
 2. **Create a Branch**
+
    ```bash
    git checkout -b feature/your-feature-name
    ```
@@ -40,6 +44,7 @@ Feature suggestions are welcome! Please:
    - Update documentation as needed
 
 4. **Test Your Changes**
+
    ```bash
    npm test
    npm run lint
@@ -47,6 +52,7 @@ Feature suggestions are welcome! Please:
    ```
 
 5. **Commit Your Changes**
+
    ```bash
    git add .
    git commit -m "feat: add your feature description"
@@ -58,6 +64,16 @@ Feature suggestions are welcome! Please:
    ```
 
 ## 📝 Code Style Guidelines
+
+**Please refer to [CODE_STANDARDS.md](./CODE_STANDARDS.md) for comprehensive code quality standards.**
+
+### Quick Reference
+
+- **TypeScript**: Strict mode enabled, explicit types required
+- **Formatting**: Prettier (automatic via pre-commit hooks)
+- **Linting**: ESLint for JS/TS, Black/isort for Python
+- **Testing**: 80%+ code coverage required
+- **Commits**: Follow Conventional Commits specification
 
 ### TypeScript/JavaScript
 
@@ -84,6 +100,8 @@ Feature suggestions are welcome! Please:
 
 ## 🧪 Testing
 
+**See [CODE_STANDARDS.md](./CODE_STANDARDS.md#testing-standards) for detailed testing guidelines.**
+
 - Write tests for new features
 - Maintain test coverage above 80%
 - Test edge cases
@@ -93,16 +111,28 @@ Feature suggestions are welcome! Please:
 
 ```bash
 # All tests
-npm test
+yarn test
+
+# With coverage report
+yarn test --coverage
 
 # Specific workspace
-npm test --workspace=apps/web
-npm test --workspace=services/api
+yarn test --workspace=apps/web
+yarn test --workspace=services/api
 
 # Python tests
 cd services/ai-microservices
-pytest
+pytest --cov
 ```
+
+### Pre-commit Hooks
+
+We use Husky for automated quality checks:
+
+- **Pre-commit**: Runs ESLint and Prettier on staged files
+- **Pre-push**: Runs TypeScript type check and tests
+
+These hooks ensure code quality before committing.
 
 ## 📚 Documentation
 
@@ -114,6 +144,7 @@ pytest
 ## 🎯 Pull Request Guidelines
 
 ### PR Title Format
+
 ```
 type(scope): description
 
@@ -124,22 +155,27 @@ docs(readme): update installation instructions
 ```
 
 ### PR Description Template
+
 ```markdown
 ## Description
+
 Brief description of changes
 
 ## Type of Change
+
 - [ ] Bug fix
 - [ ] New feature
 - [ ] Breaking change
 - [ ] Documentation update
 
 ## Testing
+
 - [ ] Tests added/updated
 - [ ] All tests passing
 - [ ] Manual testing completed
 
 ## Checklist
+
 - [ ] Code follows style guidelines
 - [ ] Self-review completed
 - [ ] Documentation updated
@@ -158,6 +194,7 @@ Brief description of changes
 ## 🚀 Development Setup
 
 ### Prerequisites
+
 - Node.js >= 18.0.0
 - npm >= 9.0.0
 - Python >= 3.9
@@ -166,17 +203,20 @@ Brief description of changes
 ### Initial Setup
 
 1. **Install Dependencies**
+
    ```bash
    npm install
    ```
 
 2. **Set Up Environment Variables**
+
    ```bash
    cp apps/web/.env.example apps/web/.env.local
    cp services/api/.env.example services/api/.env
    ```
 
 3. **Start Services**
+
    ```bash
    # Start databases with Docker
    docker-compose up -d postgres redis minio
@@ -193,6 +233,8 @@ Brief description of changes
    ```
 
 ## 🏗️ Project Structure
+
+**See [ARCHITECTURE.md](./ARCHITECTURE.md) for detailed architecture documentation.**
 
 ```
 jacameno-music/
@@ -248,6 +290,7 @@ jacameno-music/
 ## 🎯 Focus Areas
 
 We especially welcome contributions in:
+
 - VST plugin integration
 - Audio processing algorithms
 - AI model improvements
@@ -270,6 +313,7 @@ By contributing, you agree that your contributions will be licensed under the MI
 ## 🙏 Recognition
 
 Contributors will be:
+
 - Listed in CONTRIBUTORS.md
 - Mentioned in release notes
 - Credited in documentation

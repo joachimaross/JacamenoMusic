@@ -22,15 +22,19 @@ JACAMENO is an all-in-one music ecosystem that surpasses traditional DAWs by com
 ## ✨ Key Features
 
 ### 🎹 Virtual Studio Mode
+
 AI producer that guides your entire creative session with voice commands and real-time suggestions.
 
 ### 🎚️ Professional Mixing & Mastering
+
 Multi-track mixing with AI EQ, compression, reverb, and genre-specific presets.
 
 ### ✍️ Songwriting & Vocal Coaching
+
 AI writes lyrics, melodies, and provides real-time vocal analysis with personalized coaching.
 
 ### 🎛️ VST Plugin Support
+
 - Load VST2/VST3 plugins directly in JACAMENO
 - AI suggests plugin chains and tweaks parameters
 - Save presets per project
@@ -38,17 +42,21 @@ AI writes lyrics, melodies, and provides real-time vocal analysis with personali
 - Integrated marketplace for discovering VSTs
 
 ### 🤝 Smart Collaboration
+
 Real-time multi-user collaboration with synced stems, lyrics, voice chat, and version control.
 
 ### 📊 Performance Analytics
+
 Track streams, fan engagement, and get AI-powered release strategies.
 
 ### 📱 Cross-Platform
+
 Works seamlessly on web, iOS, and Android with offline creation mode.
 
 ## 🚀 Quick Start
 
 ### Prerequisites
+
 - Node.js >= 18.0.0
 - npm >= 9.0.0 or Yarn >= 1.22.0
 - Python >= 3.9 (for AI services)
@@ -83,6 +91,7 @@ python main.py
 ```
 
 ### Access Points
+
 - **Web Portal**: http://localhost:3000
 - **Backend API**: http://localhost:4000
 - **GraphQL Playground**: http://localhost:4000/graphql
@@ -123,17 +132,20 @@ jacameno-music/
 
 ## 📚 Documentation
 
-Comprehensive documentation is available in the [docs](./docs) directory:
+Comprehensive documentation is available in the repository:
 
 - [Full Documentation](./docs/README.md)
 - [API Reference](./docs/api.md)
-- [Architecture Guide](./docs/architecture.md)
+- [**Code Standards**](./CODE_STANDARDS.md) - TypeScript, JavaScript, Python, and testing standards
+- [**Architecture Guide**](./ARCHITECTURE.md) - System architecture and design patterns
 - [Deployment Guide](./docs/deployment.md)
 - [**Vercel Deployment Guide**](./DEPLOYMENT.md) - Quick guide for deploying to Vercel
+- [Contributing Guidelines](./CONTRIBUTING.md) - How to contribute to the project
 
 ## 🎯 Core Capabilities
 
 ### Audio Production
+
 - Multi-track recording and editing
 - Professional mixing console
 - AI-powered mastering
@@ -141,6 +153,7 @@ Comprehensive documentation is available in the [docs](./docs) directory:
 - Genre-specific presets
 
 ### AI Features
+
 - Lyrics generation
 - Vocal coaching and analysis
 - Automated mixing suggestions
@@ -148,6 +161,7 @@ Comprehensive documentation is available in the [docs](./docs) directory:
 - Plugin recommendations
 
 ### Collaboration
+
 - Real-time multi-user sessions
 - Synced playback and editing
 - Integrated voice/text chat
@@ -155,6 +169,7 @@ Comprehensive documentation is available in the [docs](./docs) directory:
 - Project sharing
 
 ### Streaming Platform
+
 - Native music streaming
 - AI-curated playlists
 - Direct royalty payouts
@@ -164,6 +179,7 @@ Comprehensive documentation is available in the [docs](./docs) directory:
 ## 🔌 API Endpoints
 
 ### REST API
+
 ```
 GET    /health                     # Health check
 POST   /api/v1/projects            # Create project
@@ -175,6 +191,7 @@ GET    /api/v1/vst/plugins         # List VST plugins
 ```
 
 ### GraphQL
+
 ```graphql
 query {
   projects {
@@ -194,6 +211,7 @@ query {
 ```
 
 ### WebSocket Events
+
 - `join-project` - Join collaboration session
 - `track-update` - Real-time track changes
 - `playback-control` - Sync playback

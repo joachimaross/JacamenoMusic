@@ -1,0 +1,72 @@
+version: 2
+updates:
+  # Enable version updates for npm
+  - package-ecosystem: 'npm'
+    directory: '/'
+    schedule:
+      interval: 'weekly'
+      day: 'monday'
+      time: '03:00'
+    open-pull-requests-limit: 10
+    reviewers:
+      - 'joachimaross'
+    labels:
+      - 'dependencies'
+      - 'automated'
+    versioning-strategy: increase
+    allow:
+      - dependency-type: 'all'
+    commit-message:
+      prefix: 'chore(deps)'
+      include: 'scope'
+
+  # Web app dependencies
+  - package-ecosystem: 'npm'
+    directory: '/apps/web'
+    schedule:
+      interval: 'weekly'
+      day: 'tuesday'
+    open-pull-requests-limit: 5
+    reviewers:
+      - 'joachimaross'
+    labels:
+      - 'dependencies'
+      - 'web'
+
+  # API service dependencies
+  - package-ecosystem: 'npm'
+    directory: '/services/api'
+    schedule:
+      interval: 'weekly'
+      day: 'tuesday'
+    open-pull-requests-limit: 5
+    reviewers:
+      - 'joachimaross'
+    labels:
+      - 'dependencies'
+      - 'api'
+
+  # Python AI services dependencies
+  - package-ecosystem: 'pip'
+    directory: '/services/ai-microservices'
+    schedule:
+      interval: 'weekly'
+      day: 'wednesday'
+    open-pull-requests-limit: 5
+    reviewers:
+      - 'joachimaross'
+    labels:
+      - 'dependencies'
+      - 'ai-services'
+
+  # GitHub Actions dependencies
+  - package-ecosystem: 'github-actions'
+    directory: '/'
+    schedule:
+      interval: 'monthly'
+    open-pull-requests-limit: 5
+    reviewers:
+      - 'joachimaross'
+    labels:
+      - 'dependencies'
+      - 'ci-cd'
