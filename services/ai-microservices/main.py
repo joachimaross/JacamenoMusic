@@ -3,6 +3,23 @@ from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from typing import List, Optional
 import uvicorn
+import os
+
+# Sentry integration for error monitoring
+try:
+    import sentry_sdk
+    from sentry_sdk.integrations.fastapi import FastApiIntegration
+    
+    SENTRY_DSN = os.getenv("SENTRY_DSN")
+    if SENTRY_DSN:
+        sentry_sdk.init(
+            dsn=SENTRY_DSN,
+            integrations=[FastApiIntegration()],
+            traces_sample_rate=1.0,
+            environment=os.getenv("ENVIRONMENT", "development"),
+        )
+except ImportError:
+    print("Warning: Sentry SDK not installed. Error monitoring disabled.")
 
 app = FastAPI(
     title="JACAMENO AI Microservices",
